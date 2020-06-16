@@ -3,10 +3,7 @@
 
 This crate provides the `ini!` macro which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
 
-This is a simple macro utility built on top of `configparser` with no other dependencies built on Rust. It is inspired by Python's `configparser`.
-
-The current release of `configparser` is experimental, this means that future releases will be swift until we reach `stable` (1.0.0).
-The codebase is thus subject to change for now.
+This is a simple macro utility built on top of `configparser` with no other dependencies built on Rust. For more advanced functions, you should use the [configparser](https://crates.io/crates/configparser) crate.
 
 ## Quick Start
 
@@ -33,12 +30,23 @@ ini = "1.0.0"
 ```
 
 ### The `ini!` macro
+The `ini!` macro allows you to simply get a hashmap for a list of files. It is planned to provide shell expansion in the future:
+```rust
+let map = ini!("...path/to/file");
+// Proceed to use normal HashMap functions on the map:
+let val = map["section"]["key"].clone().unwrap();
+// The type of the map is HashMap<String, HashMap<String, Option<String>>>
+
+// To load multiple files, just do:
+let map1, map2, map3 = ini!("path/to/file1", "path/to/file2", "path/to/file3");
+// Each map is a cloned hashmap with no relation to other ones
+```
 
 
 ## Supported datatypes
 `configparser` does not guess the datatype of values in configuration files and stores everything as strings, same applies to `ini`. If you need getters that parse the values for you, you might want to use `configparser`. You can ofcourse just choose to parse the string values yourself.
 ```rust
-let my_string = String::from("1984");
+let my_string = map["section"]["key"].clone().unwrap();
 let my_int = my_string.parse::<i32>().unwrap();
 ```
 
@@ -80,61 +88,6 @@ An important thing to note is that values with the same keys will get updated, t
 or property key) is the one that remains in the `HashMap`.
 The only bit of magic the API does is the section-less properties are put in a section called "default". It is planned to allow configuring this variable.
 
-## Usage
-Let's take another simple `ini` file and talk about working with it:
-```INI
-[topsecret]
-KFC = the secret herb is orega-
-
-[values]
-Int = -31415
-```
-If you read the above sections carefully, you'll know that 1) all the keys are stored in lowercase, 2) `get()` can make access in a case-insensitive
-manner and 3) we can use `getint()` to parse the `Int` value into an `i64`. Let's see that in action.
-
-```rust
-use configparser::ini::Ini;
-use std::error::Error;
-
-fn main() -> Result<(), Box<dyn Error>> {
-  let mut config = Ini::new();
-
-  // You can easily load a file to get a clone of the map:
-  let map = config.load("tests/test.ini")?;
-  println!("{:?}", map);
-  // You can also safely not store the reference and access it later with get_map_ref() or get a clone with get_map()
-
-  // You can then access it like a normal hashmap:
-  let innermap = map["topsecret"].clone(); // Remember this is a hashmap!
-
-  // If you want to access the value, then you can simply do:
-  let val = map["topsecret"]["kfc"].clone().unwrap();
-  // Lowercasing when accessing map directly is important because all keys are stored in lower-case!
-  // Note: The .clone().unwrap() is required because it's an Option<String> type.
-
-  assert_eq!(val, "the secret herb is orega-"); // value accessible!
-
-  // What if you want to mutate the parser and remove KFC's secret recipe? Just use get_mut_map():
-  let mut_map = config.get_mut_map();
-  mut_map.get_mut("topsecret").unwrap().insert(String::from("kfc"), None);
-  // And the secret is back in safety, remember that these are normal HashMap functions chained for convenience.
-
-  // However very quickly see how that becomes cumbersome, so you can use the handy get() function from Ini
-  // The get() function accesses the map case-insensitively, so you can use uppercase as well:
-  let val = config.get("topsecret", "KFC"); // unwrapping will be an error because we just emptied it!
-  assert_eq!(val, None); // as expected!
-
-  // What if you want to get a number?
-  let my_number = config.getint("values", "Int")?.unwrap();
-  assert_eq!(my_number, -31415); // and we got it!
-  // The Ini struct provides more getters for primitive datatypes.
-
-  Ok(())
-}
-```
-The `Ini` struct is the way to go forward and will soon have more features, such as reading from a string, insertion, deletion, index access
-as well as support for comments.
-
 ## License
 
 Licensed under either of
@@ -149,38 +102,3 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the LGPL-3.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
-
-## Changelog
-
-Old changelogs are in [CHANGELOG.md](CHANGELOG.md).
-- 0.5.0 (**BETA**) (yanked)
-  - Changelog added.
-  - Support for value-less keys.
-  - `HashMap` values are now `Option<String>` instead of `String` to denote empty values vs. no values.
-  - Documentation greatly improved.
-  - Syntax docs provided.
-  - `new()` and `get()` methods are simplified.
-- 0.5.1
-  - Fixed erroneous docs
-- 0.6.0 (**BETA 2**)
-  - Tests added
-  - `get_map_ref()` and `get_mut_map()` are now added to allow direct `HashMap` index access making things greatly easier.
-- 0.6.1 (yanked)
-  - Fixed tests
-- 0.6.2
-  - Fixed accidental binary delivery increasing crate size by ~20x
-- 0.7.0 (**BETA 3**)
-  - Handy getter functions introduced such as `getint()`, `getuint()`, `getfloat()`, `getbool()`
-  - Fixed docs
-  - Fixed tests
-- 0.7.1
-  - Enable `Eq` and `PartialEq` traits
-  - Improve docs
-
-### Future plans
-
-- Support for `ini::load()` will be dropped in the next major releaser per SemVer (i.e. 1.0.0)
-  - It will be replaced with a macro for a similar functionality.
-  - It has been marked as deprecated.
-- More functions for `Ini` struct, such as reading from a string, insertion and deletion.
-- Support for comments
