@@ -28,7 +28,8 @@ ini = "1.0.0"
 ```
 
 ### The `ini!` macro
-The `ini!` macro allows you to simply get a hashmap for a list of files. It is planned to provide shell expansion and file-writing in the future:
+The `ini!` macro allows you to simply get a hashmap of type `HashMap<String, HashMap<String, Option<String>>>` for a list of files.
+It is planned to provide shell expansion and file-writing in the future:
 ```ignore,rust
 #[macro_use]
 extern crate ini;
@@ -37,7 +38,6 @@ fn main() {
   let map = ini!("...path/to/file");
   // Proceed to use normal HashMap functions on the map:
   let val = map["section"]["key"].clone().unwrap();
-  // The type of the map is HashMap<String, HashMap<String, Option<String>>>
 
   // To load multiple files, just do:
   let (map1, map2, map3) = ini!("path/to/file1", "path/to/file2", "path/to/file3");
@@ -102,7 +102,8 @@ The only bit of magic the API does is the section-less properties are put in a s
 pub use configparser;
 use std::collections::HashMap;
 
-///The `ini!` macro allows you to simply get a hashmap for a list of files. It is planned to provide shell expansion and file-writing in the future:
+///The `ini!` macro allows you to simply get a hashmap of type `HashMap<String, HashMap<String, Option<String>>>` for a list of files.
+///It is planned to provide shell expansion and file-writing in the future:
 ///```ignore,rust
 ///#[macro_use]
 ///extern crate ini;
