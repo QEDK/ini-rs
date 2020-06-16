@@ -123,9 +123,9 @@ use std::collections::HashMap;
 ///`Result<HashMap, String>` type and let you deal with errors gracefully.
 ///```ignore,rust
 ///let map = ini!(safe "...path/to/file");
-///// Proceed to use normal HashMap functions on the map:
+/// // Proceed to use normal HashMap functions on the map:
 ///let val = map.unwrap()["section"]["key"].clone().unwrap();
-///// Note the extra unwrap here, which is required because our HashMap is inside a Result type.
+/// // Note the extra unwrap here, which is required because our HashMap is inside a Result type.
 ///```
 #[macro_export]
 macro_rules! ini {
