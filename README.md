@@ -26,7 +26,7 @@ Essentially, the syntax consists of sections, each of which can which contains k
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-ini = "1.0.0"
+ini = "1.0.1"
 ```
 
 ### The `ini!` macro
@@ -99,7 +99,7 @@ is_this_same=yes
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
-The only bit of magic the API does is the section-less properties are put in a section called "default". It is planned to allow configuring this variable.
+The only bit of magic the API does is the section-less properties are put in a section called "default".
 
 ## License
 
