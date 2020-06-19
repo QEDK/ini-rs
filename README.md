@@ -26,7 +26,7 @@ Essentially, the syntax consists of sections, each of which can which contains k
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-ini = "1.0.2"
+ini = "1.1.0"
 ```
 
 ### The `ini!` macro
@@ -54,6 +54,39 @@ let map = ini!(safe "...path/to/file");
 // Proceed to use normal HashMap functions on the map:
 let val = map.unwrap()["section"]["key"].clone().unwrap();
 // Note the extra unwrap here, which is required because our HashMap is inside a Result type.
+```
+
+### The `inistr!` macro
+The `inistr!` macro allows you to simply get a hashmap of type `HashMap<String, HashMap<String, Option<String>>>` for a list of strings.
+```rust
+#[macro_use]
+extern crate ini;
+
+fn main() {
+  let configstring = "[section]
+    key = value
+    top = secret";
+  let map = inistr!(configstring);
+  // Proceed to use normal HashMap functions on the map:
+  let val = map["section"]["top"].clone().unwrap();
+  // The type of the map is HashMap<String, HashMap<String, Option<String>>>
+  assert_eq!(val, "secret"); // value accessible!
+
+  // To load multiple string, just do:
+  let (map1, map2, map3) = inistr!(&String::from(configstring), configstring,  "[section]
+    key = value
+    top = secret");
+  // Each map is a cloned hashmap with no relation to other ones
+}
+```
+If loading a file fails or the parser is unable to parse the file, the code will `panic` with an appropriate error. In case, you want to handle this
+gracefully, it's recommended you use the `safe` metavariable instead. This will make sure your code does not panic and instead exists as a
+`Result<HashMap, String>` type and let you deal with errors gracefully.
+```rust
+let map = inistr!(safe strvariable_or_strliteral);
+ // Proceed to use normal HashMap functions on the map:
+let val = map.unwrap()["section"]["key"].clone().unwrap();
+ // Note the extra unwrap here, which is required because our HashMap is inside a Result type.
 ```
 
 ## Supported datatypes
