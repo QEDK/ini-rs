@@ -103,7 +103,6 @@ pub use configparser;
 use std::collections::HashMap;
 
 ///The `ini!` macro allows you to simply get a hashmap of type `HashMap<String, HashMap<String, Option<String>>>` for a list of files.
-///It is planned to provide shell expansion and file-writing in the future:
 ///```ignore,rust
 ///#[macro_use]
 ///extern crate ini;
@@ -138,24 +137,24 @@ macro_rules! ini {
 	}};
 }
 ///The `inistr!` macro allows you to simply get a hashmap of type `HashMap<String, HashMap<String, Option<String>>>` for a list of strings.
-///It is planned to provide shell expansion and file-writing in the future:
-///```ignore,rust
+///```rust
 ///#[macro_use]
 ///extern crate ini;
 ///
 ///fn main() {
-///	 let configstring = "[section]
-///		key = value
-///		top = secret";
+///  let configstring = "[section]
+///    key = value
+///    top = secret";
 ///  let map = inistr!(configstring);
 ///  // Proceed to use normal HashMap functions on the map:
 ///  let val = map["section"]["top"].clone().unwrap();
 ///  // The type of the map is HashMap<String, HashMap<String, Option<String>>>
+///  assert_eq!(val, "secret"); // value accessible!
 ///
 ///  // To load multiple string, just do:
 ///  let (map1, map2, map3) = inistr!(&String::from(configstring), configstring,  "[section]
-///		key = value
-///		top = secret");
+///    key = value
+///    top = secret");
 ///  // Each map is a cloned hashmap with no relation to other ones
 ///}
 ///```
