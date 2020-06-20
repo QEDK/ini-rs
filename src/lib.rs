@@ -64,8 +64,9 @@ let my_int = my_string.parse::<i32>().unwrap();
 ## Supported `ini` file structure
 A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
 Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
-explain it later). Key-value pairs or section headers cannot span multiple lines.
-Owing to how ini files usually are, this means that `[`, `]` and `=` are special symbols (this crate will allow you to use `]` sparingly).
+explain it later). You can use comment symbols (`;` and `#` to denote comments). If you want to select custom symbols, use the `configparser` crate.
+Keep in mind that key-value pairs or section headers cannot span multiple lines.
+Owing to how ini files usually are, this means that `[`, `]`, `=`, ';' and `#` are special symbols (this crate will allow you to use `]` sparingly).
 
 Let's take for example:
 ```INI
@@ -74,7 +75,9 @@ Let's take for example:
 are the section headers above same? = yes
 sectionheaders_and_keysarestored_in_lowercase? = yes
 keys_are_also_case_insensitive = Values are case sensitive
-spaces in keys=allowed
+;anything after a comment symbol is ignored
+#this is also a comment
+spaces in keys=allowed ;and everything before this is still valid!
 spaces in values=allowed as well
 spaces around the delimiter = also OK
 
@@ -89,15 +92,15 @@ integers, floats and booleans are held as= strings
 a_valueless_key_has_None
 this key has an empty string value has Some("") =
 
-[indented sections]
-can_values_be_as_well = True
-purpose = formatting for readability
-is_this_same     =        yes
-is_this_same=yes
+    [indented sections]
+        can_values_be_as_well = True
+        purpose = formatting for readability
+        is_this_same     =        yes
+            is_this_same=yes
 ```
 An important thing to note is that values with the same keys will get updated, this means that the last inserted key (whether that's a section header
 or property key) is the one that remains in the `HashMap`.
-The only bit of magic the API does is the section-less properties are put in a section called "default". It is planned to allow configuring this variable.
+The only bit of magic the API does is the section-less properties are put in a section called "default".
 */
 pub use configparser;
 use std::collections::HashMap;
