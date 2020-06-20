@@ -20,13 +20,6 @@ User = QEDK
 ```
 Essentially, the syntax consists of sections, each of which can which contains keys with values.
 
-### Installation
-You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
-```TOML
-[dependencies]
-ini = "1.0.0"
-```
-
 ### The `ini!` macro
 The `ini!` macro allows you to simply get a hashmap of type `HashMap<String, HashMap<String, Option<String>>>` for a list of files.
 It is planned to provide shell expansion and file-writing in the future:

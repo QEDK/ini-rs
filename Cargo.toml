@@ -1,6 +1,6 @@
 [package]
 name = "ini"
-version = "1.1.0"
+version = "1.2.0"
 authors = ["QEDK <qedk.en@gmail.com>"]
 edition = "2018"
 description = "A simple macro built on top of configparser to load and parse ini files. You can use this to write Rust programs which can be customized by end users easily."
