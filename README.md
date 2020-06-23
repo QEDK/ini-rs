@@ -26,7 +26,7 @@ Essentially, the syntax consists of sections, each of which can which contains k
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-ini = "1.2.1"
+ini = "1.2.2"
 ```
 
 ### The `ini!` macro
@@ -90,7 +90,7 @@ let val = map.unwrap()["section"]["key"].clone().unwrap();
 ```
 
 ## Supported datatypes
-`configparser` does not guess the datatype of values in configuration files and stores everything as strings, same applies to `ini`. If you need getters that parse the values for you, you might want to use `configparser`. You can ofcourse just choose to parse the string values yourself.
+`configparser` does not guess the datatype of values in configuration files and stores everything as strings, same applies to `ini`. If you need getters that parse the values for you, you might want to use the `configparser` crate instead. You can ofcourse just choose to parse the string values yourself.
 ```rust
 let my_string = map["section"]["key"].clone().unwrap();
 let my_int = my_string.parse::<i32>().unwrap();
@@ -100,7 +100,7 @@ let my_int = my_string.parse::<i32>().unwrap();
 A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
 Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
 explain it later). You can use comment symbols (`;` and `#` to denote comments). Keep in mind that key-value pairs or section headers cannot span multiple lines.
-Owing to how ini files usually are, this means that `[`, `]`, `=`, ';' and `#` are special symbols (this crate will allow you to use `]` sparingly).
+Owing to how ini files usually are, this means that `[`, `]`, `=`, `;` and `#` are special symbols (this crate will allow you to use `]` sparingly).
 
 Let's take for example:
 ```INI

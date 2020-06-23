@@ -1,6 +1,6 @@
 [package]
 name = "ini"
-version = "1.2.1"
+version = "1.2.2"
 authors = ["QEDK <qedk.en@gmail.com>"]
 edition = "2018"
 description = "A simple macro built on top of configparser to load and parse ini files. You can use this to write Rust programs which can be customized by end users easily."
@@ -17,6 +17,6 @@ travis-ci = { repository = "QEDK/ini-rs", branch = "master" }
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-configparser = "0.9.1"
+configparser = "0.9.2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
