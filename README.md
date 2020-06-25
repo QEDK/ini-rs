@@ -141,7 +141,7 @@ The only bit of magic the API does is the section-less properties are put in a s
 Licensed under either of
 
 * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-* Lesser General Public license v3.0 ([LICENSE-LGPL](LICENSE-LGPL) or https://www.gnu.org/licenses/lgpl-3.0.html)
+* Lesser General Public license v3.0 or later ([LICENSE-LGPL](LICENSE-LGPL) or https://www.gnu.org/licenses/lgpl-3.0.html)
 
 at your option.
 
