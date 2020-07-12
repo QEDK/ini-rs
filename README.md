@@ -26,7 +26,7 @@ Essentially, the syntax consists of sections, each of which can which contains k
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-ini = "1.2.5"
+ini = "1.2.6"
 ```
 
 ### The `ini!` macro
