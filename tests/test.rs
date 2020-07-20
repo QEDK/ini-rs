@@ -22,7 +22,7 @@ fn main() {
 
 	[section]
 	key = 42");
-	let (map5, map6) = inistr!(&String::from(instring), instring);
+	let (map5, map6) = inistr!(&instring.to_owned(), instring);
 	assert_eq!(assert_eq!(map5, map6), assert_eq!(map5, map4.clone().unwrap()));
 	assert_eq!(assert_eq!(map2, map5), assert_eq!(map1, map4));
 	assert_eq!(map1.unwrap()["section"]["key"].clone().unwrap(), "42");
