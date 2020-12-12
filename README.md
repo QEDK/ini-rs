@@ -1,5 +1,5 @@
 # ini
-[![Build Status](https://travis-ci.com/QEDK/ini-rs.svg?branch=master)](https://travis-ci.com/QEDK/ini-rs) [![Crates.io](https://img.shields.io/crates/l/ini?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/ini?color=black)](https://crates.io/crates/ini) [![Released API docs](https://docs.rs/ini/badge.svg)](https://docs.rs/ini) [![Maintenance](https://img.shields.io/maintenance/yes/2020)](https://github.com/QEDK/ini-rs)
+[![Build Status](https://travis-ci.com/mexili/ini-rs.svg?branch=master)](https://travis-ci.com/mexili/ini-rs) [![Crates.io](https://img.shields.io/crates/l/ini?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/ini?color=black)](https://crates.io/crates/ini) [![Released API docs](https://docs.rs/ini/badge.svg)](https://docs.rs/ini) [![Maintenance](https://img.shields.io/maintenance/yes/2020)](https://github.com/mexili/ini-rs)
 
 This crate provides the `ini!` macro which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
 
