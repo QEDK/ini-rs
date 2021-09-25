@@ -17,6 +17,6 @@ travis-ci = { repository = "QEDK/ini-rs", branch = "master" }
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-configparser = "1.0.0"
+configparser = "2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
