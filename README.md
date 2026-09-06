@@ -1,5 +1,5 @@
 # ini
-[![Build Status](https://travis-ci.com/mexili/ini-rs.svg?branch=master)](https://travis-ci.com/mexili/ini-rs) [![Crates.io](https://img.shields.io/crates/l/ini?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/ini?color=black)](https://crates.io/crates/ini) [![Released API docs](https://docs.rs/ini/badge.svg)](https://docs.rs/ini) [![Maintenance](https://img.shields.io/maintenance/yes/2020)](https://github.com/mexili/ini-rs)
+[![Rust CI](https://github.com/QEDK/ini-rs/actions/workflows/rust.yaml/badge.svg)](https://github.com/QEDK/ini-rs/actions/workflows/rust.yaml) [![Crates.io](https://img.shields.io/crates/l/ini?color=black)](LICENSE-MIT) [![Crates.io](https://img.shields.io/crates/v/ini?color=black)](https://crates.io/crates/ini) [![Released API docs](https://docs.rs/ini/badge.svg)](https://docs.rs/ini)
 
 This crate provides the `ini!` macro which implements a basic configuration language which provides a structure similar to what’s found in Windows' `ini` files. You can use this to write Rust programs which can be customized by end users easily.
 
@@ -26,81 +26,114 @@ Essentially, the syntax consists of sections, each of which can which contains k
 You can install this easily via `cargo` by including it in your `Cargo.toml` file like:
 ```TOML
 [dependencies]
-ini = "1.3.0"
+ini = "2.0.0"
 ```
+This crate requires Rust 1.85 or newer.
 
 ### The `ini!` macro
-The `ini!` macro allows you to simply get a hashmap of type `HashMap<String, HashMap<String, Option<String>>>` for a list of files.
-It is planned to provide shell expansion and file-writing in the future:
+The `ini!` macro allows you to simply get a hashmap of type `IniMap` for a list of files:
 ```rust
-#[macro_use]
-extern crate ini;
+use ini::ini;
 
-fn main() {
-  let map = ini!("...path/to/file");
-  // Proceed to use normal HashMap functions on the map:
-  let val = map["section"]["key"].clone().unwrap();
+let map = ini!("tests/test.ini");
+// Proceed to use normal HashMap functions on the map:
+let val = map["section"]["key"].clone().unwrap();
+assert_eq!(val, "42");
 
-  // To load multiple files, just do:
-  let (map1, map2, map3) = ini!("path/to/file1", "path/to/file2", "path/to/file3");
-  // Each map is a cloned hashmap with no relation to other ones
-}
+// To load multiple files, just do:
+let (map1, map2) = ini!("tests/test.ini", "tests/test.ini");
+// Each map is a cloned hashmap with no relation to other ones
+assert_eq!(map1, map2);
 ```
 If loading a file fails or the parser is unable to parse the file, the code will `panic` with an appropriate error. In case, you want to handle this
 gracefully, it's recommended you use the `safe` metavariable instead. This will make sure your code does not panic and instead exists as a
-`Result<HashMap, String>` type and let you deal with errors gracefully.
+`Result<IniMap, String>` type and let you deal with errors gracefully.
 ```rust
-let map = ini!(safe "...path/to/file");
+use ini::ini;
+
+let map = ini!(safe "tests/test.ini");
 // Proceed to use normal HashMap functions on the map:
 let val = map.unwrap()["section"]["key"].clone().unwrap();
 // Note the extra unwrap here, which is required because our HashMap is inside a Result type.
+assert_eq!(val, "42");
+```
+Section and key names are lowercased by default. Add the `cs` metavariable to keep them case-sensitive. It can be combined with `safe`:
+```rust
+use ini::ini;
+
+let map = ini!(cs "tests/test.ini");
+assert!(map.contains_key("VALUES2"));
+let map = ini!(safe cs "tests/test.ini").unwrap();
+assert!(map.contains_key("VALUES2"));
 ```
 
 ### The `inistr!` macro
-The `inistr!` macro allows you to simply get a hashmap of type `HashMap<String, HashMap<String, Option<String>>>` for a list of strings.
+The `inistr!` macro works the same way as `ini!` but parses strings instead of files, and accepts the same `safe` and `cs` metavariables:
 ```rust
-#[macro_use]
-extern crate ini;
+use ini::inistr;
 
-fn main() {
-  let configstring = "[section]
-    key = value
-    top = secret";
-  let map = inistr!(configstring);
-  // Proceed to use normal HashMap functions on the map:
-  let val = map["section"]["top"].clone().unwrap();
-  // The type of the map is HashMap<String, HashMap<String, Option<String>>>
-  assert_eq!(val, "secret"); // value accessible!
+let configstring = "[section]
+  key = value
+  top = secret";
+let map = inistr!(configstring);
+assert_eq!(map["section"]["top"].clone().unwrap(), "secret");
 
-  // To load multiple string, just do:
-  let (map1, map2, map3) = inistr!(&String::from(configstring), configstring,  "[section]
-    key = value
-    top = secret");
-  // Each map is a cloned hashmap with no relation to other ones
-}
+let (map1, map2) = inistr!(&String::from(configstring), configstring);
+assert_eq!(map1, map2);
+
+let map = inistr!(safe cs "[Section]
+  Key = value").unwrap();
+assert_eq!(map["Section"]["Key"].clone().unwrap(), "value");
 ```
-If loading a file fails or the parser is unable to parse the file, the code will `panic` with an appropriate error. In case, you want to handle this
-gracefully, it's recommended you use the `safe` metavariable instead. This will make sure your code does not panic and instead exists as a
-`Result<HashMap, String>` type and let you deal with errors gracefully.
+
+### The `inimerge!` macro
+The `inimerge!` macro loads several files into a single map, in order. Values from later files override earlier ones, which is handy for layering
+user configuration on top of defaults. It accepts the same `safe` and `cs` metavariables:
 ```rust
-let map = inistr!(safe strvariable_or_strliteral);
- // Proceed to use normal HashMap functions on the map:
-let val = map.unwrap()["section"]["key"].clone().unwrap();
- // Note the extra unwrap here, which is required because our HashMap is inside a Result type.
+use ini::inimerge;
+
+let map = inimerge!("tests/test.ini", "tests/override.ini");
+assert_eq!(map["section"]["key"].clone().unwrap(), "43"); // overridden
+assert_eq!(map["values"]["key"].clone().unwrap(), "value"); // kept from the first file
+```
+
+### The `iniwrite!` and `iniwrites!` macros
+`iniwrite!` writes a map back to a file with valid ini-syntax, and `iniwrites!` returns the same output as a `String`. `iniwrite!` panics on I/O
+errors unless the `safe` metavariable is used, in which case it returns a `std::io::Result<()>`:
+```rust
+use ini::{inistr, iniwrite, iniwrites};
+
+let map = inistr!("[section]
+  key = value");
+let output = iniwrites!(map);
+assert_eq!(inistr!(&output), map); // round-trips
+
+let path = std::env::temp_dir().join("ini-doctest.ini");
+iniwrite!(&path, map);
+iniwrite!(safe &path, &map).unwrap();
 ```
 
 ## Supported datatypes
-`configparser` does not guess the datatype of values in configuration files and stores everything as strings, same applies to `ini`. If you need getters that parse the values for you, you might want to use the `configparser` crate instead. You can ofcourse just choose to parse the string values yourself.
+`configparser` does not guess the datatype of values in configuration files and stores everything as strings, same applies to `ini`. If you need getters that parse the values for you, you might want to use the `configparser` crate. You can ofcourse just choose to parse the string values yourself.
 ```rust
 let my_string = map["section"]["key"].clone().unwrap();
 let my_int = my_string.parse::<i32>().unwrap();
 ```
 
+## Map type
+Every macro returns an `IniMap`, a nested `HashMap<String, HashMap<String, Option<String>>>`. Enable the `indexmap` feature to get an
+`IndexMap` instead, which preserves the order of sections and keys as they appear in the file:
+```TOML
+[dependencies]
+ini = { version = "2.0.0", features = ["indexmap"] }
+```
+
 ## Supported `ini` file structure
-A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive. All leading and trailing whitespace is removed from stored keys, values and section names.
+A configuration file can consist of sections, each led by a `[section-name]` header, followed by key-value entries separated by a `=`. By default, section names and key names are case-insensitive (use `cs` to change that). All leading and trailing whitespace is removed from stored keys, values and section names.
 Key values can be omitted, in which case the key-value delimiter (`=`) may also be left out (but this is different from putting a delimiter, we'll
-explain it later). You can use comment symbols (`;` and `#` to denote comments). Keep in mind that key-value pairs or section headers cannot span multiple lines.
-Owing to how ini files usually are, this means that `[`, `]`, `=`, `;` and `#` are special symbols (this crate will allow you to use `]` sparingly).
+explain it later). You can use comment symbols (`;` and `#` to denote comments). If you want to select custom symbols, use the `configparser` crate.
+Keep in mind that key-value pairs or section headers cannot span multiple lines.
+Owing to how ini files usually are, this means that `[`, `]`, `=`, ';' and `#` are special symbols (this crate will allow you to use `]` sparingly).
 
 Let's take for example:
 ```INI
