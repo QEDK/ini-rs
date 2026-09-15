@@ -314,11 +314,7 @@ macro_rules! iniwrites {
 }
 
 fn new_ini(cs: bool) -> Ini {
-    if cs {
-        Ini::new_cs()
-    } else {
-        Ini::new()
-    }
+    if cs { Ini::new_cs() } else { Ini::new() }
 }
 
 fn from_map(map: &IniMap) -> Ini {
